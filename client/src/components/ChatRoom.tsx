@@ -1,21 +1,24 @@
-import { useParams, useNavigate } from "react-router-dom";
-import useMessage from "../hooks/useMessage";
-import MessageList from "./MessageList";
-import { ArrowLeft } from "lucide-react";
+import { useParams, useNavigate } from 'react-router-dom';
+import useMessage from '../hooks/useMessage';
+import MessageList from './MessageList';
+import { ArrowLeft } from 'lucide-react';
+import { useContext } from 'react';
+import { CurrentUserContext } from '../App';
 
 const ChatRoom = () => {
   const navigate = useNavigate();
   const { groupChatId } = useParams<{ groupChatId: string }>();
+  const { currentUser } = useContext(CurrentUserContext);
 
   const { messages, inputMessage, setInputMessage, sendMessage, error } =
-    useMessage(groupChatId ?? "");
+    useMessage(groupChatId ?? '', currentUser ?? '');
 
   if (error) {
     return (
       <main className="flex min-h-screen flex-col items-center gap-10 bg-gray-100 p-10">
         <section className="flex w-full max-w-md flex-row items-center gap-10">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="rounded-md bg-gray-200 p-2 transition-colors hover:bg-gray-300"
           >
             <ArrowLeft />
@@ -33,7 +36,7 @@ const ChatRoom = () => {
     <main className="flex min-h-screen flex-col items-center gap-10 bg-gray-100 p-10">
       <section className="flex w-full max-w-md flex-row items-center gap-10">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="rounded-md bg-gray-200 p-2 transition-colors hover:bg-gray-300"
         >
           <ArrowLeft />

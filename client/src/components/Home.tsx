@@ -1,16 +1,23 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CurrentUserContext } from '../App';
 
 const Home = () => {
   const navigate = useNavigate();
-  const [chatRoomId, setChatRoomId] = useState("");
+  const [chatRoomId, setChatRoomId] = useState('');
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
   const handleJoinChatRoom = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedChatRoomId = chatRoomId.trim();
 
-    if (chatRoomId.trim() === "") {
-      alert("Please enter a chat room id");
+    if (chatRoomId.trim() === '') {
+      alert('Please enter a chat room id');
+      return;
+    }
+
+    if (currentUser?.trim() === '') {
+      alert('Please enter a user name');
       return;
     }
 
@@ -38,6 +45,23 @@ const Home = () => {
             placeholder="Enter the chat room id..."
             value={chatRoomId}
             onChange={(event) => setChatRoomId(event.target.value)}
+            required={true}
+          />
+        </section>
+
+        <section className="flex flex-col gap-1">
+          <label className="text-sm" htmlFor="user-name">
+            User Name
+          </label>
+          <input
+            className="rounded-md border border-gray-300 p-2"
+            type="text"
+            id="user-name"
+            aria-label="User Name"
+            placeholder="Enter your user name..."
+            value={currentUser ?? ''}
+            onChange={(event) => setCurrentUser(event.target.value)}
+            required={true}
           />
         </section>
 

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import type { TMessage } from "../types";
+import { useEffect, useState } from 'react';
+import type { TMessage } from '../types';
 
-const useMessage = (groupChatId: string) => {
+const useMessage = (groupChatId: string, userName: string) => {
   const [messages, setMessages] = useState<TMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState<string>("");
+  const [inputMessage, setInputMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
 
@@ -14,10 +14,12 @@ const useMessage = (groupChatId: string) => {
     const webSocket = new WebSocket(`ws://localhost:8080`);
 
     webSocket.onopen = () => {
-      console.log("Connected to local server");
+      console.log('Connected to local server');
 
       // Send a join message with the groupChatId when the connection opens
-      webSocket.send(JSON.stringify({ action: "join", groupChatId }));
+      webSocket.send(
+        JSON.stringify({ action: 'join', groupChatId, user: userName })
+      );
     };
 
     webSocket.onmessage = async (event) => {
@@ -43,14 +45,14 @@ const useMessage = (groupChatId: string) => {
 
     return () => {
       webSocket.close();
-      console.log("Disconnected from local server");
+      console.log('Disconnected from local server');
     };
-  }, [groupChatId]);
+  }, [groupChatId, userName]);
 
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!ws || inputMessage.trim() === "") {
+    if (!ws || inputMessage.trim() === '') {
       return; // Do nothing if WebSocket isn't set up or message is empty
     }
 
@@ -59,17 +61,18 @@ const useMessage = (groupChatId: string) => {
       // Send message only if WebSocket connection is open
       ws.send(
         JSON.stringify({
-          action: "message",
+          action: 'message',
           groupChatId,
           message: {
             id: crypto.randomUUID(),
             content: inputMessage,
+            user: userName,
           },
-        }),
+        })
       );
-      setInputMessage(""); // Clear input message after sending
+      setInputMessage(''); // Clear input message after sending
     } else {
-      console.error("WebSocket is not open.");
+      console.error('WebSocket is not open.');
       // Optionally, handle the "still connecting" state or errors differently here
     }
   };
