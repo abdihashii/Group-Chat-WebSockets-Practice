@@ -4,11 +4,14 @@ import MessageList from './MessageList';
 import { ArrowLeft } from 'lucide-react';
 import { useContext } from 'react';
 import { CurrentUserContext } from '../App';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const ChatRoom = () => {
 	const navigate = useNavigate();
 	const { groupChatId } = useParams<{ groupChatId: string }>();
 	const { currentUser } = useContext(CurrentUserContext);
+
+	useDocumentTitle(groupChatId ?? '');
 
 	const { messages, inputMessage, setInputMessage, sendMessage, error } =
 		useMessage(groupChatId ?? '', currentUser ?? '');
