@@ -1,33 +1,33 @@
-import { WebSocketServer, WebSocket } from "ws";
-import { ExtendedWebSocket, TMessage } from "./types";
+import { WebSocketServer, WebSocket } from 'ws';
+import { ExtendedWebSocket, TMessage } from './types';
 
 const wss = new WebSocketServer({ port: 8080 });
 
 const groupChatMap: Record<string, TMessage[]> = {
-  "jimbos-group": [
+  'jimbos-group': [
     {
-      id: "1",
+      id: '1',
       content: "Welcome to Jimbo's group chat!",
-      user: "Jimbo",
+      user: 'Jimbo',
     },
     {
-      id: "2",
-      content: "Happy to be here!",
-      user: "Boberson",
+      id: '2',
+      content: 'Happy to be here!',
+      user: 'Boberson',
     },
   ],
 };
 
-wss.on("connection", function connection(ws: ExtendedWebSocket) {
-  ws.on("error", console.error);
+wss.on('connection', function connection(ws: ExtendedWebSocket) {
+  ws.on('error', console.error);
 
-  ws.on("message", function incoming(data) {
+  ws.on('message', function incoming(data) {
     try {
       const messageObj = JSON.parse(data.toString());
-      const { action, groupChatId, message } = messageObj;
+      const { action, groupChatId, message, user } = messageObj;
 
       switch (action) {
-        case "join":
+        case 'join':
           // check if the group exists, return an error if it doesn't
           if (!groupChatMap[groupChatId]) {
             console.error(`Group chat with id ${groupChatId} does not exist.`);
@@ -36,7 +36,7 @@ wss.on("connection", function connection(ws: ExtendedWebSocket) {
             ws.send(
               JSON.stringify({
                 error: `Group chat with id ${groupChatId} does not exist.`,
-              }),
+              })
             );
 
             // Exit early to stop further processing if the group doesn't exist
@@ -45,18 +45,18 @@ wss.on("connection", function connection(ws: ExtendedWebSocket) {
 
           ws.groupChatId = groupChatId; // Attach the groupChatId to the WebSocket connection
 
-          console.log(`User joined group: ${groupChatId}`);
+          console.log(`${user} joined group: ${groupChatId}!`);
 
           // Send back all messages from this group
           if (groupChatMap[groupChatId]) {
-            groupChatMap[groupChatId].forEach((msg) => {
-              ws.send(JSON.stringify({ groupChatId, message: msg })); // Ensure structured message
+            groupChatMap[groupChatId].forEach((message) => {
+              ws.send(JSON.stringify({ groupChatId, message })); // Ensure structured message
             });
           }
           break;
 
-        case "message":
-          console.log(`Received in ${groupChatId}: ${message.content}`);
+        case 'message':
+          console.log(`From '${user}' in '${groupChatId}': ${message.content}`);
 
           if (!groupChatMap[groupChatId]) {
             groupChatMap[groupChatId] = [];
@@ -70,18 +70,18 @@ wss.on("connection", function connection(ws: ExtendedWebSocket) {
               client.readyState === WebSocket.OPEN &&
               client.groupChatId === groupChatId
             ) {
-              client.send(JSON.stringify({ groupChatId, message })); // Adjusted for structured message
+              client.send(JSON.stringify({ groupChatId, message, user })); // Adjusted for structured message
             }
           });
           break;
 
         default:
-          console.error("Unsupported action.");
+          console.error('Unsupported action.');
       }
     } catch (err) {
-      console.error("Failed to process message: ", err);
+      console.error('Failed to process message: ', err);
     }
   });
 });
 
-console.log("WebSocket server is running on port 8080.");
+console.log('WebSocket server is running on port 8080.');
