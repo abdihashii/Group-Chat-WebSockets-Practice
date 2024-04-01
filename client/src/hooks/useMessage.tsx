@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react';
 import type { TMessage } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 const useMessage = (groupChatId: string, userName: string) => {
+	const navigate = useNavigate();
 	const [messages, setMessages] = useState<TMessage[]>([]);
 	const [inputMessage, setInputMessage] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [ws, setWs] = useState<WebSocket | null>(null);
 
 	useEffect(() => {
+		if (!userName) {
+			navigate('/');
+			return;
+		}
+
 		// Clear the messages state when establishing a new WebSocket connection
 		setMessages([]);
 
@@ -47,6 +54,8 @@ const useMessage = (groupChatId: string, userName: string) => {
 			webSocket.close();
 			console.log('Disconnected from local server');
 		};
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [groupChatId, userName]);
 
 	const sendMessage = (event: React.FormEvent) => {

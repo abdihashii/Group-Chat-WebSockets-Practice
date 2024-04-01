@@ -56,7 +56,9 @@ wss.on('connection', function connection(ws: ExtendedWebSocket) {
 					break;
 
 				case 'message':
-					console.log(`From '${user}' in '${groupChatId}': ${message.content}`);
+					console.log(
+						`From '${message.user}' in '${groupChatId}': ${message.content}`,
+					);
 
 					if (!groupChatMap[groupChatId]) {
 						groupChatMap[groupChatId] = [];
