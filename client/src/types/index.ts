@@ -1,5 +1,5 @@
 export type TMessage = {
-  id: string;
-  content: string;
-  user: string;
+	id: string;
+	content: string;
+	user: string;
 };
